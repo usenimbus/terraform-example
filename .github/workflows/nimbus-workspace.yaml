@@ -10,7 +10,7 @@ on:
 
 jobs:
   terraform:
-    name: "Terraform"
+    name: "Provision Nimbus Workspace"
     runs-on: ubuntu-latest
     env:
       NIMBUS_AUTH_TOKEN: ${{ secrets.NIMBUS_AUTH_TOKEN }}
