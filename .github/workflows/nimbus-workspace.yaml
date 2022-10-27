@@ -1,7 +1,6 @@
 name: Provision Nimbus Workspace
 run-name: Provision Nimbus Workspace
 on: 
-  push:
   workflow_dispatch:
     inputs:
       workspaceId:
