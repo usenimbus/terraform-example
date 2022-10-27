@@ -3,6 +3,10 @@ terraform {
     nimbus = {
       source = "usenimbus/nimbus"
     }
+    aws = {
+      source  = "hashicorp/aws"
+      version = "~> 4.16"
+    }
   }
 }
 
