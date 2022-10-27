@@ -26,6 +26,11 @@ jobs:
           echo "provider_installation {filesystem_mirror {path    = \"$(eval echo ~$USER)/.terraform.d/plugins\"}}" > ~/.terraformrc
           ls -lah ~/
           cat ~/.terraformrc
+          mkdir -p ~/.terraform.d/plugins/registry.terraform.io/usenimbus/nimbus/0.1.0
+          curl https://github.com/usenimbus/terraform-provider-nimbus/releases/download/v0.1.0/terraform-provider-nimbus_v0.1.0 \
+            -o ~/.terraform.d/plugins/registry.terraform.io/usenimbus/nimbus/0.1.0/linux_amd64
+
+          ls ~/.terraform.d/plugins/registry.terraform.io/usenimbus/nimbus/0.1.0/
 
       # - name: Terraform Format
       #   id: fmt
