@@ -23,7 +23,7 @@ jobs:
 
       - name: Setup terraform local repo
         run: |
-          echo "provider_installation {filesystem_mirror {path    = \"$PWD/.terraform.d/plugins\"}}" > ~/.terraformrc
+          echo "provider_installation {filesystem_mirror {path    = \"$(eval echo ~$USER)/.terraform.d/plugins\"}}" > ~/.terraformrc
           ls -lah ~/
           cat ~/.terraformrc
 
