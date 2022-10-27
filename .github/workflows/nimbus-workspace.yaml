@@ -37,7 +37,6 @@ jobs:
 
       - name: Terraform Plan
         id: plan
-        if: github.event_name == 'pull_request'
         run: terraform plan -no-color -input=false -plugin-dir="$(eval echo ~$USER)/.terraform.d/plugins"
         continue-on-error: true
 
