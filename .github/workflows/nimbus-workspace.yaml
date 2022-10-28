@@ -24,7 +24,7 @@ jobs:
       - name: Setup terraform local repo
         run: |
           mkdir -p ~/.terraform.d/plugins/registry.terraform.io/usenimbus/nimbus/1.0.0/linux_amd64
-          curl https://github.com/usenimbus/terraform-provider-nimbus/releases/download/v0.1.0/terraform-provider-nimbus_v0.1.0 \
+          curl -L https://github.com/usenimbus/terraform-provider-nimbus/releases/download/v0.1.0/terraform-provider-nimbus_v0.1.0 \
             -o ~/.terraform.d/plugins/registry.terraform.io/usenimbus/nimbus/1.0.0/linux_amd64/terraform-provider-nimbus
           
           chmod 755 ~/.terraform.d/plugins/registry.terraform.io/usenimbus/nimbus/1.0.0/linux_amd64/terraform-provider-nimbus
