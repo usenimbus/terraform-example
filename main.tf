@@ -60,7 +60,7 @@ provider "aws" {
   region = var.region
 }
 
-data "aws_ami" "ubuntu" {
+data "aws_ami" "ubuntu_ami" {
   most_recent = true
   filter {
     name   = "name"
@@ -95,7 +95,7 @@ locals {
   vpc       = aws_default_vpc.default.id
   # az        = keys(local.region_vpc_az_subnet_map[var.region][local.vpc])[0]
   subnet_id = aws_default_subnet.default.id
-  ami       = data.aws_ami.ubuntu.id
+  ami       = data.aws_ami.ubuntu_ami.id
   hostname  = "${var.workspace_name}.dev.usenimbus.com"
 }
 
