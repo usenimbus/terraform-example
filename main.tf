@@ -132,7 +132,6 @@ resource "aws_instance" "www" {
 
   ami                         = local.ami
   instance_type               = var.instance_type
-  availability_zone           = local.az
   associate_public_ip_address = false
   vpc_security_group_ids      = [aws_security_group.www.id]
   subnet_id                   = local.subnet_id
