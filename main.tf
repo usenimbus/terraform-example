@@ -11,7 +11,7 @@ variable "nimbusAuthToken" {
 }
 
 provider "nimbus" {
-  auth_token = data.nimbusAuthToken
+  auth_token = var.nimbusAuthToken
 }
 
 variable "region" {
