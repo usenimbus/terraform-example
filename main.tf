@@ -64,7 +64,7 @@ data "aws_ami" "ubuntu" {
   most_recent = true
   filter {
     name   = "name"
-    values = ["dbx-devbox-prep*"]
+    values = ["ubuntu*"]
   }
   filter {
     name   = "virtualization-type"
