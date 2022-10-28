@@ -74,6 +74,10 @@ data "aws_ami" "ubuntu" {
     name   = "architecture"
     values = ["x86_64"]
   }
+  filter {
+    name = "region"
+    values=[var.region]
+  }
   owners = ["099720109477"] # Canonical
 }
 
