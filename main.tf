@@ -60,11 +60,11 @@ provider "aws" {
   region = var.region
 }
 
-data "aws_ami" "ubuntu_ami" {
+data "aws_ami" "ubuntu" {
   most_recent = true
   filter {
     name   = "name"
-    values = ["ubuntu*"]
+    values = ["ubuntu/images/hvm-ssd/ubuntu-focal-20.04-amd64-server-*"]
   }
   filter {
     name   = "virtualization-type"
@@ -95,7 +95,7 @@ locals {
   vpc       = aws_default_vpc.default.id
   # az        = keys(local.region_vpc_az_subnet_map[var.region][local.vpc])[0]
   subnet_id = aws_default_subnet.default.id
-  ami       = data.aws_ami.ubuntu_ami.id
+  ami       = data.aws_ami.ubuntu.id
   hostname  = "${var.workspace_name}.dev.usenimbus.com"
 }
 
