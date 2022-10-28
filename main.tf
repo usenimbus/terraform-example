@@ -60,34 +60,42 @@ provider "aws" {
   region = var.region
 }
 
-locals {
-  region_vpc_az_subnet_map = {
-    "ap-southeast-1" = {
-      "<vpc-1>" = {
-        "ap-southeast-1b" = ["<subnet-1>"]
-      }
-    }
-    "us-east-1"      = {
-      "<vpc-2>" = {
-        "us-east-1c" = ["<subnet-2>"]
-      }
-    }
-    "us-west-2"      = {
-      "<vpc-3>" = {
-        "us-west-2b" = ["<subnet-1>"]
-      }
-    }
+data "aws_ami" "ubuntu" {
+  most_recent = true
+  filter {
+    name   = "name"
+    values = ["dbx-devbox-prep*"]
   }
-  amis = {
-    "ap-southeast-1" = "<ami-1>"
-    "us-east-1"      = "<ami-2>"
-    "us-west-2"      = "<ami-3>"
+  filter {
+    name   = "virtualization-type"
+    values = ["hvm"]
   }
+  filter {
+    name   = "tag:ubuntu-version"
+    values = ["focal"]
+  }
+  owners = ["211075537450"] # Canonical
+}
 
-  vpc       = keys(local.region_vpc_az_subnet_map[var.region])[0]
-  az        = keys(local.region_vpc_az_subnet_map[var.region][local.vpc])[0]
-  subnet_id = local.region_vpc_az_subnet_map[var.region][local.vpc][local.az][0]
-  ami       = local.amis[var.region]
+resource "aws_default_vpc" "default" {
+  tags = {
+    Name = "Default VPC"
+  }
+}
+
+resource "aws_default_subnet" "default" {
+  availability_zone = "us-west-2a"
+
+  tags = {
+    Name = "Default subnet for us-west-2a"
+  }
+}
+
+locals {
+  vpc       = aws_default_vpc.default.id
+  # az        = keys(local.region_vpc_az_subnet_map[var.region][local.vpc])[0]
+  subnet_id = aws_default_subnet.default.id
+  ami       = data.aws_ami.ubuntu.id
   hostname  = "${var.workspace_name}.dev.usenimbus.com"
 }
 
