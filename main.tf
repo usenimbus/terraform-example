@@ -74,7 +74,7 @@ data "aws_ami" "ubuntu" {
     name   = "tag:ubuntu-version"
     values = ["focal"]
   }
-  owners = ["211075537450"] # Canonical
+  owners = ["099720109477"] # Canonical
 }
 
 resource "aws_default_vpc" "default" {
