@@ -16,10 +16,10 @@ provider "nimbus" {
 
 variable "region" {
   description = "region"
-  default     = "us-west-2"
+  default     = "eu-west-2"
   validation {
     condition = contains([
-      "us-west-2"
+      "eu-west-2"
     ], var.region)
     error_message = "invalid region"
   }
@@ -82,10 +82,10 @@ resource "aws_default_vpc" "default" {
 }
 
 resource "aws_default_subnet" "default" {
-  availability_zone = "us-west-2a"
+  availability_zone = "eu-west-2a"
 
   tags = {
-    Name = "Default subnet for us-west-2a"
+    Name = "Default subnet for eu-west-2a"
   }
 }
 
