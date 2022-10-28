@@ -157,7 +157,7 @@ resource "nimbus_workspace" "www_dev" {
     aws_instance.www
   ]
 
-  name        = local.workspace_name
+  name        = var.workspace_name
   template_id = data.nimbus_template.www.id
   region      = var.region
 
