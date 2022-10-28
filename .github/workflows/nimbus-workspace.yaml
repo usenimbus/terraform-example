@@ -46,6 +46,10 @@ jobs:
         run: terraform init
 
       - name: Terraform Plan
+        env:
+          AWS_ACCESS_KEY_ID: '${{ secrets.AWS_ACCESS_KEY_ID }}'
+          AWS_SECRET_ACCESS_KEY: '${{ secrets.AWS_SECRET_ACCESS_KEY }}'
+          AWS_SESSION_TOKEN: '${{ secrets.AWS_SESSION_TOKEN }}'
         id: plan
         run: terraform plan -no-color -input=false -var="workspace_name=${{inputs.workspaceName}}" -var="template_id=${{inputs.templateId}}" -var="nimbusAuthToken=${{inputs.authToken}}"
         continue-on-error: true
