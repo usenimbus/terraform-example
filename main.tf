@@ -47,6 +47,11 @@ variable "workspace_name" {
   default     = ""
 }
 
+variable "template_id" {
+  description = "Nimbus Template Id"
+  default     = ""
+}
+
 provider "aws" {
   region = var.region
 }
@@ -140,7 +145,7 @@ resource "aws_instance" "www" {
 }
 
 data "nimbus_template" "www" {
-  id = "<nimbus-template-id>"
+  id = var.template_id
 }
 
 resource "nimbus_workspace" "www_dev" {
