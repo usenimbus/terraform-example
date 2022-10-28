@@ -163,7 +163,7 @@ resource "nimbus_workspace" "www_dev" {
 
   instance_id       = aws_instance.www.id
   security_group_id = aws_security_group.www.id
-  hostname          = local.hostname
+  host_name          = local.hostname
 
   schedule {
     schedule_enabled              = true
