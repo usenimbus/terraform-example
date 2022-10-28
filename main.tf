@@ -6,8 +6,12 @@ terraform {
   }
 }
 
+variable "nimbusAuthToken" {
+  description = "Nimbus Auth Token"
+}
+
 provider "nimbus" {
-  auth_token = ""
+  auth_token = data.nimbusAuthToken
 }
 
 variable "region" {

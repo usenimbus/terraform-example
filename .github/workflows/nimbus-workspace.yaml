@@ -47,7 +47,7 @@ jobs:
 
       - name: Terraform Plan
         id: plan
-        run: terraform plan -no-color -input=false -var="workspace_name=${{inputs.workspaceName}}" -var="template_id=${{inputs.authToken}}" -var="nimbus.auth_token=${{inputs.authToken}}"
+        run: terraform plan -no-color -input=false -var="workspace_name=${{inputs.workspaceName}}" -var="template_id=${{inputs.authToken}}" -var="nimbusAuthToken=${{inputs.authToken}}"
         continue-on-error: true
 
       # - uses: actions/github-script@v6
