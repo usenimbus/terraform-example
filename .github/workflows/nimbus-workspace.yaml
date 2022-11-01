@@ -61,6 +61,10 @@ jobs:
         id: apply
         run: terraform apply -no-color -auto-approve -input=false -var="workspace_name=${{inputs.workspaceName}}" -var="template_id=${{inputs.templateId}}" -var="nimbusAuthToken=${{inputs.authToken}}"
 
+      - name: Update Nimbus Status
+        run: |
+          echo "Update"
+
       # - uses: actions/github-script@v6
       #   if: github.event_name == 'pull_request'
       #   env:
