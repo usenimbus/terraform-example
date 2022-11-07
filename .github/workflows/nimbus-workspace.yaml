@@ -16,6 +16,9 @@ on:
       authToken:
         description: 'Nimbus Auth Token'
         required: true
+      awsRegion:
+        description: 'AWS Region'
+        required: true
 
 jobs:
   terraform:
@@ -56,7 +59,7 @@ jobs:
           AWS_SECRET_ACCESS_KEY: '${{ secrets.AWS_SECRET_ACCESS_KEY }}'
           AWS_SESSION_TOKEN: '${{ secrets.AWS_SESSION_TOKEN }}'
         id: plan
-        run: terraform plan -no-color -input=false -var="workspace_name=${{inputs.workspaceName}}" -var="workspace_id=${{inputs.workspaceId}}" -var="template_id=${{inputs.templateId}}" -var="nimbusAuthToken=${{inputs.authToken}}"
+        run: terraform plan -no-color -input=false -var="workspace_name=${{inputs.workspaceName}}" -var="region=${{inputs.awsRegion}}" -var="workspace_id=${{inputs.workspaceId}}" -var="template_id=${{inputs.templateId}}" -var="nimbusAuthToken=${{inputs.authToken}}"
 
       - name: Terraform Apply
         env:
@@ -65,7 +68,7 @@ jobs:
           AWS_SESSION_TOKEN: '${{ secrets.AWS_SESSION_TOKEN }}'
         id: apply
         run: |
-          terraform apply -no-color -auto-approve -input=false -var="workspace_name=${{inputs.workspaceName}}" -var="workspace_id=${{inputs.workspaceId}}" -var="template_id=${{inputs.templateId}}" -var="nimbusAuthToken=${{inputs.authToken}}"
+          terraform apply -no-color -auto-approve -input=false -var="workspace_name=${{inputs.workspaceName}}" -var="region=${{inputs.awsRegion}}" -var="workspace_id=${{inputs.workspaceId}}" -var="template_id=${{inputs.templateId}}" -var="nimbusAuthToken=${{inputs.authToken}}"
           terraform output 
 
       - name: Update Nimbus Status
