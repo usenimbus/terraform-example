@@ -17,12 +17,6 @@ provider "nimbus" {
 variable "region" {
   description = "region"
   default     = "eu-west-2"
-  validation {
-    condition = contains([
-      "eu-west-2"
-    ], var.region)
-    error_message = "invalid region"
-  }
 }
 
 variable "instance_type" {
