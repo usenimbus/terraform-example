@@ -10,6 +10,11 @@ variable "nimbusAuthToken" {
   description = "Nimbus Auth Token"
 }
 
+resource "random_string" "resource_suffix" {
+  length           = 16
+  special          = false
+}
+
 provider "nimbus" {
   auth_token = var.nimbusAuthToken
 }
@@ -100,8 +105,10 @@ locals {
   hostname  = "${var.workspace_name}.dev.usenimbus.com"
 }
 
+
+
 resource "aws_security_group" "www" {
-  name   = var.workspace_name
+  name   = "nimbus-${var.workspace_name}-${random_string.resource_suffix.result}"
   vpc_id = local.vpc
 
   ingress {
