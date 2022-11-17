@@ -17,6 +17,7 @@ resource "random_string" "resource_suffix" {
 
 provider "nimbus" {
   auth_token = var.nimbusAuthToken
+  # nimbus_url = "https://alpine.usenimbus.com/graphql"
 }
 
 variable "region" {
