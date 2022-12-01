@@ -1,4 +1,9 @@
 terraform {
+  backend "s3" {
+    bucket = "nimbus-terraform-workspaces"
+    region = "us-west-2"
+  }
+  
   required_providers {
     nimbus = {
       source = "usenimbus/nimbus"
@@ -6,23 +11,19 @@ terraform {
   }
 }
 
-variable "nimbusAuthToken" {
-  description = "Nimbus Auth Token"
-}
-
 resource "random_string" "resource_suffix" {
   length           = 16
   special          = false
 }
 
-provider "nimbus" {
-  auth_token = var.nimbusAuthToken
-  # nimbus_url = "https://alpine.usenimbus.com/graphql"
-}
-
 variable "region" {
   description = "region"
-  default     = "eu-west-2"
+  validation {
+    condition = contains([
+      "us-west-2"
+    ], var.region)
+    error_message = "region not supported"
+  }
 }
 
 variable "instance_type" {
@@ -42,21 +43,6 @@ variable "instance_type" {
 variable "storage" {
   description = ""
   default     = 50
-}
-
-variable "workspace_name" {
-  description = "Name your workspace"
-  default     = ""
-}
-
-variable "workspace_id" {
-  description = "Existing workspace Id"
-  default     = ""
-}
-
-variable "template_id" {
-  description = "Nimbus Template Id"
-  default     = ""
 }
 
 provider "aws" {
@@ -80,36 +66,20 @@ data "aws_ami" "ubuntu" {
   owners = ["099720109477"] # Canonical
 }
 
-resource "aws_default_vpc" "default" {
-  tags = {
-    Name = "Default VPC"
-  }
-}
 
-data "aws_availability_zones" "available" {
-  state = "available"
-}
-
-resource "aws_default_subnet" "default" {
-  availability_zone = data.aws_availability_zones.available.names[0]
-
-  tags = {
-    Name = "Default subnet for eu-west-2a"
-  }
-}
 
 locals {
-  vpc       = aws_default_vpc.default.id
-  # az        = keys(local.region_vpc_az_subnet_map[var.region][local.vpc])[0]
-  subnet_id = aws_default_subnet.default.id
-  ami       = data.aws_ami.ubuntu.id
-  hostname  = "${var.workspace_name}.dev.usenimbus.com"
+  vpcs        = {"us-west-2": "vpc-03add4cfea117e679"}
+  subnets     = {"us-west-2": "subnet-0b3238ac3635afc2d"}
+  vpc         = local.vpcs[var.region]
+  subnet      = local.subnets[var.region]
+  ami         = data.aws_ami.ubuntu.id
 }
 
 
 
 resource "aws_security_group" "www" {
-  name   = "nimbus-${var.workspace_name}-${random_string.resource_suffix.result}"
+  name   = "nimbus-${random_string.resource_suffix.result}"
   vpc_id = local.vpc
 
   ingress {
@@ -129,7 +99,6 @@ resource "aws_security_group" "www" {
   }
 
   tags = {
-    Name      = var.workspace_name
     ManagedBy = "Nimbus"
   }
 }
@@ -146,21 +115,19 @@ resource "aws_instance" "www" {
     sudo useradd -m -d /home/nimbus-user nimbus-user
     sudo adduser nimbus-user sudo
     sudo chown nimbus-user:nimbus-user /home/nimbus-user
-
     
     sudo echo "nimbus-user ALL=(ALL) NOPASSWD:ALL" >> /etc/sudoers.d/90-nimbus-users
     sudo echo "nimbus-user ALL=(ALL) NOPASSWD:ALL" >> /etc/sudoers.d/90-nimbus-users
     sudo echo "nimbus-user ALL=(ALL) NOPASSWD:ALL" >> /etc/sudoers.d/90-nimbus-users
     sudo echo "nimbus-user ALL=(ALL) NOPASSWD:ALL" >> /etc/sudoers.d/90-nimbus-users
-
     
   EOF
 
   ami                         = local.ami
   instance_type               = var.instance_type
   associate_public_ip_address = true
+  subnet_id                   = local.subnet
   vpc_security_group_ids      = [aws_security_group.www.id]
-  subnet_id                   = local.subnet_id
 
   root_block_device {
     volume_type           = "gp3"
@@ -170,19 +137,13 @@ resource "aws_instance" "www" {
     throughput            = 250
 
     tags = {
-      Name      = var.workspace_name
       ManagedBy = "Nimbus"
     }
   }
 
   tags = {
-    Name      = var.workspace_name
     ManagedBy = "Nimbus"
   }
-}
-
-data "nimbus_template" "www" {
-  id = var.template_id
 }
 
 resource "nimbus_workspace" "www_dev" {
@@ -190,39 +151,7 @@ resource "nimbus_workspace" "www_dev" {
     aws_instance.www
   ]
 
-  workspace_id        = var.workspace_id
-  name        = var.workspace_name
-  template_id = data.nimbus_template.www.id
-  region      = var.region
-
+  region            = var.region
   instance_id       = aws_instance.www.id
   security_group_id = aws_security_group.www.id
-
-  schedule {
-    schedule_enabled              = true
-    inactivity_timeout_in_minutes = 60
-    schedule_groups {
-      days {
-        day               = "Thursday"
-        start_time_hour   = 3
-        start_time_minute = 0
-        end_time_hour     = 4
-        end_time_minute   = 0
-      }
-      days {
-        day               = "Friday"
-        start_time_hour   = 3
-        start_time_minute = 0
-        end_time_hour     = 4
-        end_time_minute   = 0
-      }
-      days {
-        day               = "Monday"
-        start_time_hour   = 1
-        start_time_minute = 0
-        end_time_hour     = 8
-        end_time_minute   = 0
-      }
-    }
-  }
 }
