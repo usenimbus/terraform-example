@@ -131,14 +131,15 @@ resource "nimbus_workspace_metadata" "workspace" {
 }
 
 resource "nimbus_workspace_metadata" "arbitrary_metadata" {
+  name = "arbitrary metadata"
+
   item {
     key   = "instance_status"
     value = "stopped"
   }
 
   item {
-    key       = "security_group_id"
-    value     = "sg-abcdefg"
-    sensitive = true
+    key   = "security_group_id"
+    value = "sg-abcdefg"
   }
 }
