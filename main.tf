@@ -3,17 +3,12 @@ terraform {
     bucket = "nimbus-terraform-workspaces"
     region = "us-west-2"
   }
-  
+
   required_providers {
     nimbus = {
       source = "usenimbus/nimbus"
     }
   }
-}
-
-resource "random_string" "resource_suffix" {
-  length           = 16
-  special          = false
 }
 
 variable "region" {
@@ -67,46 +62,15 @@ data "aws_ami" "ubuntu" {
 }
 
 
-
 locals {
-  vpcs        = {"us-west-2": "vpc-03add4cfea117e679"}
-  subnets     = {"us-west-2": "subnet-0b3238ac3635afc2d"}
-  vpc         = local.vpcs[var.region]
-  subnet      = local.subnets[var.region]
-  ami         = data.aws_ami.ubuntu.id
+  vpcs    = { "us-west-2" : "vpc-03add4cfea117e679" }
+  subnets = { "us-west-2" : "subnet-0b3238ac3635afc2d" }
+  vpc     = local.vpcs[var.region]
+  subnet  = local.subnets[var.region]
+  ami     = data.aws_ami.ubuntu.id
 }
 
-
-
-resource "aws_security_group" "www" {
-  name   = "nimbus-${random_string.resource_suffix.result}"
-  vpc_id = local.vpc
-
-  ingress {
-    description = "SSH"
-    from_port   = 22
-    to_port     = 22
-    protocol    = "tcp"
-    cidr_blocks = ["0.0.0.0/0"]
-  }
-
-  egress {
-    from_port        = 0
-    to_port          = 0
-    protocol         = "-1"
-    cidr_blocks      = ["0.0.0.0/0"]
-    ipv6_cidr_blocks = ["::/0"]
-  }
-
-  tags = {
-    ManagedBy = "Nimbus"
-  }
-}
-
-resource "aws_instance" "www" {
-  depends_on = [
-    aws_security_group.www
-  ]
+resource "aws_instance" "nimbus" {
 
   user_data = <<-EOF
     #!/usr/bin/env bash
@@ -146,12 +110,36 @@ resource "aws_instance" "www" {
   }
 }
 
-resource "nimbus_workspace" "www_dev" {
-  depends_on = [
-    aws_instance.www
-  ]
+resource "nimbus_workspace_metadata" "workspace" {
+  name = "workspace" # `workspace` is a reserved name for top level workspace metadata
 
-  region            = var.region
-  instance_id       = aws_instance.www.id
-  security_group_id = aws_security_group.www.id
+  backend {
+    type        = "aws_ec2"
+    region      = var.region
+    instance_id = resource.aws_instance.nimbus
+  }
+
+  item {
+    key   = "instance_status"
+    value = "running"
+  }
+
+  item {
+    key   = "additional security group id"
+    value = "sg-test"
+  }
+}
+
+resource "nimbus_workspace_metadata" "arbitrary_metadata" {
+  name = "arbitrary metadata"
+
+  item {
+    key   = "instance_status"
+    value = "stopped"
+  }
+
+  item {
+    key   = "security_group_id"
+    value = "sg-abcdefg"
+  }
 }
