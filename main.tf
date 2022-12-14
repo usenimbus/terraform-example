@@ -121,15 +121,13 @@ resource "nimbus_workspace_metadata" "workspace" {
 
   item {
     key   = "instance_status"
-    value = "stopped"
+    value = "running"
   }
 
   item {
     key   = "additional security group id"
-    value = "sg-abcdefg"
+    value = "sg-test"
   }
-
-
 }
 
 resource "nimbus_workspace_metadata" "arbitrary_metadata" {
