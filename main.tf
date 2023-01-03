@@ -67,10 +67,6 @@ locals {
 }
 
 resource "aws_instance" "www" {
-  depends_on = [
-    aws_security_group.www
-  ]
-
   user_data = <<-EOF
     #!/usr/bin/env bash
     
