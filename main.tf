@@ -1,19 +1,9 @@
-terraform {
-  backend "s3" {
-    bucket = "nimbus-terraform-workspaces"
-    region = "us-west-2"
-  }
-  
+terraform {  
   required_providers {
     nimbus = {
       source = "usenimbus/nimbus"
     }
   }
-}
-
-resource "random_string" "resource_suffix" {
-  length           = 16
-  special          = false
 }
 
 variable "region" {
@@ -76,33 +66,6 @@ locals {
   ami         = data.aws_ami.ubuntu.id
 }
 
-
-
-resource "aws_security_group" "www" {
-  name   = "nimbus-${random_string.resource_suffix.result}"
-  vpc_id = local.vpc
-
-  ingress {
-    description = "SSH"
-    from_port   = 22
-    to_port     = 22
-    protocol    = "tcp"
-    cidr_blocks = ["0.0.0.0/0"]
-  }
-
-  egress {
-    from_port        = 0
-    to_port          = 0
-    protocol         = "-1"
-    cidr_blocks      = ["0.0.0.0/0"]
-    ipv6_cidr_blocks = ["::/0"]
-  }
-
-  tags = {
-    ManagedBy = "Nimbus"
-  }
-}
-
 resource "aws_instance" "www" {
   depends_on = [
     aws_security_group.www
@@ -127,7 +90,6 @@ resource "aws_instance" "www" {
   instance_type               = var.instance_type
   associate_public_ip_address = true
   subnet_id                   = local.subnet
-  vpc_security_group_ids      = [aws_security_group.www.id]
 
   root_block_device {
     volume_type           = "gp3"
@@ -146,12 +108,35 @@ resource "aws_instance" "www" {
   }
 }
 
-resource "nimbus_workspace" "www_dev" {
+resource "nimbus_workspace_metadata" "workspace" {
   depends_on = [
     aws_instance.www
   ]
+  
+  name = "workspace"
 
-  region            = var.region
-  instance_id       = aws_instance.www.id
-  security_group_id = aws_security_group.www.id
+  backend {
+    type = "aws_ec2"
+    instance_id = aws_instance.www.id
+    region = var.region
+  }
+
+  item {
+    key = "tag"
+    value = "test"
+  }
+}
+
+resource "nimbus_workspace_metadata" "param" {  
+  name = "parameters"
+
+  item {
+    key = "storage"
+    value = var.storage
+  }
+  
+  item {
+    key = "instance_type"
+    value = var.instance_type
+  }
 }
